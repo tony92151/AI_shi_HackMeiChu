@@ -1,0 +1,19 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0099cc"
+    tools:context="com.example.via_hack.Coco_Detection">
+
+    <com.example.via_hack.AutoFitSurfaceView
+        android:id="@+id/videoSurfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+    <com.example.via_hack.AutoFitSurfaceView
+        android:id="@+id/resultSurfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+</FrameLayout>
