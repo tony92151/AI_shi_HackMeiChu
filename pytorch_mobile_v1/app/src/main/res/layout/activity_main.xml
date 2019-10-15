@@ -4,38 +4,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="@drawable/bac">
+    tools:context=".MainActivity">
 
-<!--    <TextureView-->
-<!--        android:id="@+id/view_finder"-->
-<!--        android:layout_width="640px"-->
-<!--        android:layout_height="640px"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent" />-->
-    <LinearLayout
+    <!--    <TextureView-->
+    <!--        android:id="@+id/view_finder"-->
+    <!--        android:layout_width="640px"-->
+    <!--        android:layout_height="640px"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent" />-->
+    <pl.droidsonroids.gif.GifImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:paddingTop="550dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        android:background="@drawable/bacgif"
+        tools:ignore="MissingConstraints" />
 
 
-    <Button
-        android:id="@+id/btn_take_pic"
 
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:textSize="50dp"
-        android:text="拍照" />
+        android:gravity="bottom|center"
+        android:paddingBottom="30dp">
 
-    </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_take_pic"
+            android:layout_width="300dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:text="Detect"
+            android:textSize="50dp"/>
+
+
+    </RelativeLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
