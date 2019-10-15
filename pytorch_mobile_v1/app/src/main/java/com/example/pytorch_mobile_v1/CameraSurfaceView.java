@@ -14,6 +14,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -39,6 +40,9 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     //更動
     private String filePath;
     private Activity activity;
+
+    private Bitmap bitmap2detect = null;
+    private ImageView imgv = null;
 
     public CameraSurfaceView(Context context) {
         this(context, null);
@@ -87,6 +91,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
                 e.printStackTrace();
             }
         }
+        //mCamera.takePicture(null, null, jpeg);
 
     }
 
@@ -96,7 +101,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
         setCameraParams(mCamera, mScreenWidth, mScreenHeight);
         mCamera.startPreview();
-//        mCamera.takePicture(null, null, jpeg);
+        mCamera.takePicture(null, null, jpeg);
 
     }
 
@@ -243,38 +248,40 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
                 m.setRotate(90);
                 //旋转后的图片
                 bitmap = Bitmap.createBitmap(bm, 0, 0, width, height, m, true);
+                bitmap2detect = bitmap;
+                System.out.println(">>>>>>>>>>>>> get camera");
 
 
-                System.out.println("执行了吗+3");
-                File file = new File(filePath);
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-                bos = new BufferedOutputStream(new FileOutputStream(file));
-
-                Bitmap sizeBitmap = Bitmap.createScaledBitmap(bitmap,
-                        topView.getViewWidth(), topView.getViewHeight(), true);
-                bm = Bitmap.createBitmap(sizeBitmap, topView.getRectLeft()-27,           //**
-                        topView.getRectTop(),
-                        topView.getRectRight() - topView.getRectLeft(),
-                        topView.getRectBottom() - topView.getRectTop());// 截取
-
-                bm.compress(Bitmap.CompressFormat.JPEG, 100, bos);//将图片压缩到流中
+//                System.out.println("执行了吗+3");
+//                File file = new File(filePath);
+//                if (!file.exists()) {
+//                    file.createNewFile();
+//                }
+//                bos = new BufferedOutputStream(new FileOutputStream(file));
+//
+//                Bitmap sizeBitmap = Bitmap.createScaledBitmap(bitmap,
+//                        topView.getViewWidth(), topView.getViewHeight(), true);
+//                bm = Bitmap.createBitmap(sizeBitmap, topView.getRectLeft()-27,           //**
+//                        topView.getRectTop(),
+//                        topView.getRectRight() - topView.getRectLeft(),
+//                        topView.getRectBottom() - topView.getRectTop());// 截取
+//
+//                bm.compress(Bitmap.CompressFormat.JPEG, 100, bos);//将图片压缩到流中
 
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                try {
-                    bos.flush();//输出
-                    bos.close();//关闭
-                    bm.recycle();// 回收bitmap空间
-                    mCamera.stopPreview();// 关闭预览
-                    activity.setResult(Activity.RESULT_OK);
-                    activity.finish();
-//                    mCamera.startPreview();// 开启预览
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    bos.flush();//输出
+//                    bos.close();//关闭
+//                    bm.recycle();// 回收bitmap空间
+//                    mCamera.stopPreview();// 关闭预览
+//                    activity.setResult(Activity.RESULT_OK);
+//                    activity.finish();
+////                    mCamera.startPreview();// 开启预览
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             }
 
         }
@@ -294,5 +301,9 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
     }
+
+    public Bitmap getimg() { return bitmap2detect; }
+
+    public void setimgv(ImageView iv) { this.imgv = iv;}
 
 }

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,6 +19,8 @@ public class TakePicActivity extends AppCompatActivity {
 
     private Activity activity;
     String filePath;
+
+    private ImageView mImg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +37,19 @@ public class TakePicActivity extends AppCompatActivity {
                 mCameraSurfaceView.takePicture(activity, filePath);
             }
         });
+
+
+        mImg = (ImageView) findViewById(R.id.scan);
+
+        mCameraSurfaceView.setimgv(mImg);
+//        if(mCameraSurfaceView.getimg()!=null){
+//            mImg.setImageBitmap(mCameraSurfaceView.getimg());
+//            System.out.println("Get img");
+//        }else{
+//            System.out.println("Get no img");
+//        }
+
+
     }
 
     private void initSet() {

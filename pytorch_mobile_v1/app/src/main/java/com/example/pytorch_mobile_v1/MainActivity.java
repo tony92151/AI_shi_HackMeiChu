@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         mBtnPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, TakePicActivity.class));
+                startActivity(new Intent(MainActivity.this, Detect.class));
             }
         });
     }
