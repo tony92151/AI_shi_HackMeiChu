@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,9 +35,12 @@ import org.bytedeco.javacv.OpenCVFrameConverter.ToMat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -64,7 +68,7 @@ public class Detect extends AppCompatActivity {
     private int imgW;
     private int imgH;
 
-    private Module model;
+    private Module module;
 
     public AndroidFrameConverter converterToBitmap = new AndroidFrameConverter();
     public OpenCVFrameConverter.ToIplImage converterToIplImage = new OpenCVFrameConverter.ToIplImage();
@@ -85,6 +89,17 @@ public class Detect extends AppCompatActivity {
 
 
 
+        try {
+            module = Module.load(assetFilePath(this, "model.pt"));
+        } catch (IOException e) {
+            Log.e("Pytorch HelloWorld", "Error reading assets", e);
+            finish();
+        }
+
+
+
+
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,14 +115,50 @@ public class Detect extends AppCompatActivity {
                 opencv_imgproc.cvtColor(mat2de, mat2de, opencv_imgproc.COLOR_BGR2GRAY);
                 Mat dst = new Mat();
                 opencv_imgproc.equalizeHist( mat2de, dst );
-                bit2de = mat2Bitmap(dst);
+                // convert back to rgba
+                Mat frameRgba = new Mat(dst.rows(), dst.cols(), opencv_core.CV_8UC4);
+                opencv_imgproc.cvtColor(dst, frameRgba, opencv_imgproc.COLOR_GRAY2RGBA);
+                // crop again to correct alpha
+                //Mat frameAlpha = new Mat(frameRgba.rows(), frameRgba.cols(), opencv_core.CV_8UC4, new Scalar(0, 0, 0, 0));
+
+                bit2de = mat2Bitmap(frameRgba);
                 imgshow.setImageBitmap(bit2de);
 
-                //pickFromGallery();
-                ans.setText("ANS~~~");
+                bit2de  = Bitmap.createScaledBitmap(bit2de, 64, 64, true);
+
+                // preparing input tensor
+                final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(bit2de,
+                        TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB);
+                System.out.println("Convert to tensor.");
+                // running the model
+                final Tensor outputTensor = module.forward(IValue.from(inputTensor)).toTensor();
+                System.out.println("Tensor forward.");
+                // getting tensor content as java array of floats
+                final float[] scores = outputTensor.getDataAsFloatArray();
+                System.out.println("Get score.");
+//                System.out.println(Arrays.toString(s));
+                for(float log : scores)
+                {
+                    //Log.v("Tag",log);
+                    System.out.println(log);
+                }
+
+                // searching for the index with maximum score
+                float maxScore = -Float.MAX_VALUE;
+                int maxScoreIdx = -1;
+                for (int i = 0; i < scores.length; i++) {
+                    if (scores[i] > maxScore) {
+                        maxScore = scores[i];
+                        maxScoreIdx = i;
+                    }
+                }
+
+                ans.setText("ANS: "+maxScoreIdx);
             }
         });
     }
+
+    //https://androidclarified.com/pick-image-gallery-camera-android/
     private void pickFromGallery(){
         //Create an Intent with action as ACTION_PICK
         Intent intent=new Intent(Intent.ACTION_PICK);
@@ -148,6 +199,8 @@ public class Detect extends AppCompatActivity {
             }
 
     }
+
+    //https://www.cnblogs.com/popqq520/p/5404738.html
     public static Bitmap getBitmapFormUri(Activity ac, Uri uri) throws FileNotFoundException, IOException {
         InputStream input = ac.getContentResolver().openInputStream(uri);
         BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
@@ -234,8 +287,6 @@ public class Detect extends AppCompatActivity {
 
     }
 
-
-
     public Mat bitmap2Mat(Bitmap bt){
         Frame fr = converterToBitmap.convert(bt);
         Mat mat = converterToMat.convertToMat(fr);
@@ -246,5 +297,24 @@ public class Detect extends AppCompatActivity {
         Frame frame_after = converterToMat.convert(ma);
         Bitmap bitAfter = converterToBitmap.convert(frame_after);
         return  bitAfter;
+    }
+
+    public static String assetFilePath(Context context, String assetName) throws IOException {
+        File file = new File(context.getFilesDir(), assetName);
+        if (file.exists() && file.length() > 0) {
+            return file.getAbsolutePath();
+        }
+
+        try (InputStream is = context.getAssets().open(assetName)) {
+            try (OutputStream os = new FileOutputStream(file)) {
+                byte[] buffer = new byte[4 * 1024];
+                int read;
+                while ((read = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, read);
+                }
+                os.flush();
+            }
+            return file.getAbsolutePath();
+        }
     }
 }
