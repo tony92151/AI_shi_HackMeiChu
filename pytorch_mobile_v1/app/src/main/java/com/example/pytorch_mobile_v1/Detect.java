@@ -15,6 +15,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import org.bytedeco.javacpp.opencv_core.*;
+import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacpp.opencv_imgproc;
+import org.bytedeco.javacv.Frame;
+
+import org.bytedeco.javacpp.freenect2;
+import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacv.AndroidFrameConverter;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.OpenCVFrameConverter;
+
+import org.bytedeco.javacv.OpenCVFrameConverter.ToMat;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,6 +39,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import org.pytorch.IValue;
+import org.pytorch.Module;
+import org.pytorch.Tensor;
+import org.pytorch.torchvision.TensorImageUtils;
+
 
 public class Detect extends AppCompatActivity {
 
@@ -34,11 +56,20 @@ public class Detect extends AppCompatActivity {
     private Button button;
     private Button buttonD;
     private ImageView imgshow;
+    private TextView ans;
 
     private Bitmap bit2de = null;
+    private Mat mat2de = null;
 
     private int imgW;
     private int imgH;
+
+    private Module model;
+
+    public AndroidFrameConverter converterToBitmap = new AndroidFrameConverter();
+    public OpenCVFrameConverter.ToIplImage converterToIplImage = new OpenCVFrameConverter.ToIplImage();
+    public OpenCVFrameConverter.ToMat converterToMat =  new OpenCVFrameConverter.ToMat();
+
 
 
     @Override
@@ -50,6 +81,7 @@ public class Detect extends AppCompatActivity {
         button =  (Button) findViewById(R.id.sele);
         buttonD =  (Button) findViewById(R.id.butdete);
         imgshow = (ImageView)findViewById(R.id.showg);
+        ans = (TextView)findViewById(R.id.ans);
 
 
 
@@ -63,7 +95,16 @@ public class Detect extends AppCompatActivity {
         buttonD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mat2de = new Mat();
+                mat2de = bitmap2Mat(bit2de);
+                opencv_imgproc.cvtColor(mat2de, mat2de, opencv_imgproc.COLOR_BGR2GRAY);
+                Mat dst = new Mat();
+                opencv_imgproc.equalizeHist( mat2de, dst );
+                bit2de = mat2Bitmap(dst);
+                imgshow.setImageBitmap(bit2de);
+
                 //pickFromGallery();
+                ans.setText("ANS~~~");
             }
         });
     }
@@ -102,6 +143,7 @@ public class Detect extends AppCompatActivity {
                     imgshow.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     imgshow.setImageBitmap(bit);
                     bit2de = bit;
+                    ans.setText("ANS");
                     break;
             }
 
@@ -190,5 +232,19 @@ public class Detect extends AppCompatActivity {
             //Log.d(TAG, "width : " + imgv.getWidth());
         }
 
+    }
+
+
+
+    public Mat bitmap2Mat(Bitmap bt){
+        Frame fr = converterToBitmap.convert(bt);
+        Mat mat = converterToMat.convertToMat(fr);
+        return mat;
+    }
+
+    public Bitmap mat2Bitmap(Mat ma){
+        Frame frame_after = converterToMat.convert(ma);
+        Bitmap bitAfter = converterToBitmap.convert(frame_after);
+        return  bitAfter;
     }
 }

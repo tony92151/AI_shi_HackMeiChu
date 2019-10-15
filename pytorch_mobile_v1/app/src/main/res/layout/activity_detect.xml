@@ -12,8 +12,8 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:paddingTop="10dp"
-        android:weightSum="6"
-        android:paddingBottom="10dp">
+        android:weightSum="10"
+        >
 
         <ImageView
             android:id="@+id/showg"
@@ -22,12 +22,12 @@
             android:layout_height="wrap_content"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
-            android:layout_weight="4"/>
+            android:layout_weight="6"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:gravity="center_horizontal"
             android:weightSum="6">
 
@@ -48,6 +48,15 @@
             android:layout_weight="3"/>
 
         </LinearLayout>
+        <TextView
+            android:id="@+id/ans"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="3"
+            android:text="ANS"
+            android:textSize="40dp"
+            android:textStyle="bold"
+            android:gravity="center"/>
 
     </LinearLayout>
 
