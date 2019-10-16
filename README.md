@@ -2,4 +2,4 @@
 
 ## Demo
 
-<img src="https://github.com/tony92151/AI_shi_HackMeiChu/blob/master/img/dem.gif" width="360"/>
+<img src="https://github.com/tony92151/AI_shi_HackMeiChu/blob/master/img/dem2.gif" width="360"/>
