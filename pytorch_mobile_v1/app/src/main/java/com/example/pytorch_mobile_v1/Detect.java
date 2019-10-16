@@ -18,15 +18,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.bytedeco.javacpp.opencv_core.*;
+
+//import org.bytedeco.opencv.global.opencv_core;
+//import org.bytedeco.opencv.global.opencv_imgproc;
+//import org.bytedeco.opencv.opencv_core.*;
+//import org.bytedeco.opencv.opencv_imgproc.*;
+//import org.bytedeco.javacv.Frame;
+
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgproc;
-import org.bytedeco.javacv.Frame;
-
-import org.bytedeco.javacpp.freenect2;
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacv.AndroidFrameConverter;
+//import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
@@ -44,10 +46,14 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
 import org.pytorch.IValue;
 import org.pytorch.Module;
 import org.pytorch.Tensor;
 import org.pytorch.torchvision.TensorImageUtils;
+
+import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2GRAY;
+import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 
 
 public class Detect extends AppCompatActivity {
@@ -63,7 +69,7 @@ public class Detect extends AppCompatActivity {
     private TextView ans;
 
     private Bitmap bit2de = null;
-    private Mat mat2de = null;
+    private opencv_core.Mat mat2de = null;
 
     private int imgW;
     private int imgH;
@@ -110,14 +116,14 @@ public class Detect extends AppCompatActivity {
         buttonD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mat2de = new Mat();
+                mat2de = new opencv_core.Mat();
                 mat2de = bitmap2Mat(bit2de);
-                opencv_imgproc.cvtColor(mat2de, mat2de, opencv_imgproc.COLOR_BGR2GRAY);
-                Mat dst = new Mat();
+                cvtColor(mat2de, mat2de, COLOR_BGR2GRAY);
+                opencv_core.Mat dst = new opencv_core.Mat();
                 opencv_imgproc.equalizeHist( mat2de, dst );
                 // convert back to rgba
-                Mat frameRgba = new Mat(dst.rows(), dst.cols(), opencv_core.CV_8UC4);
-                opencv_imgproc.cvtColor(dst, frameRgba, opencv_imgproc.COLOR_GRAY2RGBA);
+                opencv_core.Mat frameRgba = new opencv_core.Mat(dst.rows(), dst.cols(), opencv_core.CV_8UC4);
+                cvtColor(dst, frameRgba, opencv_imgproc.COLOR_GRAY2RGBA);
                 // crop again to correct alpha
                 //Mat frameAlpha = new Mat(frameRgba.rows(), frameRgba.cols(), opencv_core.CV_8UC4, new Scalar(0, 0, 0, 0));
 
@@ -287,13 +293,13 @@ public class Detect extends AppCompatActivity {
 
     }
 
-    public Mat bitmap2Mat(Bitmap bt){
+    public opencv_core.Mat bitmap2Mat(Bitmap bt){
         Frame fr = converterToBitmap.convert(bt);
-        Mat mat = converterToMat.convertToMat(fr);
+        opencv_core.Mat mat = converterToMat.convertToMat(fr);
         return mat;
     }
 
-    public Bitmap mat2Bitmap(Mat ma){
+    public Bitmap mat2Bitmap(opencv_core.Mat ma){
         Frame frame_after = converterToMat.convert(ma);
         Bitmap bitAfter = converterToBitmap.convert(frame_after);
         return  bitAfter;
