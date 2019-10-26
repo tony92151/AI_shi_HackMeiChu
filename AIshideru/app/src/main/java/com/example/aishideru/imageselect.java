@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,6 +24,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.pytorch.IValue;
+import org.pytorch.Module;
+import org.pytorch.Tensor;
+import org.pytorch.torchvision.TensorImageUtils;
 
 public class imageselect extends AppCompatActivity {
 
@@ -40,6 +46,8 @@ public class imageselect extends AppCompatActivity {
 
     private Bitmap bit2de = null;
 
+    private Module module;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,10 +59,62 @@ public class imageselect extends AppCompatActivity {
         imgshow = (ImageView)findViewById(R.id.showg);
         ans = (TextView)findViewById(R.id.ans);
 
+        try {
+            module = Module.load(assetFilePath(this, "model_scope.pt"));
+        } catch (IOException e) {
+            Log.e("Pytorch HelloWorld", "Error reading assets", e);
+            finish();
+        }
+
         select_bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 pickFromGallery();
+            }
+        });
+
+
+        detect_bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                bit2de  = Bitmap.createScaledBitmap(bit2de, 256, 256, true);
+
+                bit2de = rotateBitmapByDegree(bit2de, 90);
+
+                float mean[] = new float[] {0.485f,0.456f,0.406f};
+                float std[] = new float[] {0.229f,0.224f,0.225f};
+
+                // preparing input tensor
+
+//                final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(bit2de,
+//                        TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB);
+                final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(bit2de, mean, std);
+                System.out.println("Convert to tensor.");
+                // running the model
+                final Tensor outputTensor = module.forward(IValue.from(inputTensor)).toTensor();
+                System.out.println("Tensor forward.");
+                // getting tensor content as java array of floats
+                final float[] scores = outputTensor.getDataAsFloatArray();
+                System.out.println("Get score.");
+//                System.out.println(Arrays.toString(s));
+                for(float log : scores)
+                {
+                    //Log.v("Tag",log);
+                    System.out.println(log);
+                }
+
+                // searching for the index with maximum score
+                float maxScore = -Float.MAX_VALUE;
+                int maxScoreIdx = -1;
+                for (int i = 0; i < scores.length; i++) {
+                    if (scores[i] > maxScore) {
+                        maxScore = scores[i];
+                        maxScoreIdx = i;
+                    }
+                }
+
+                ans.setText("ANS: "+maxScoreIdx);
             }
         });
     }
