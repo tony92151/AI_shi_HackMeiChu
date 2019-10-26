@@ -45,6 +45,7 @@ public class imageselect extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_imageselect);
 
+        activity = this;
         select_bt = (Button)findViewById(R.id.select_bt);
         detect_bt = (Button)findViewById(R.id.detect_bt);
         imgshow = (ImageView)findViewById(R.id.showg);
@@ -101,7 +102,6 @@ public class imageselect extends AppCompatActivity {
     }
 
     //https://www.cnblogs.com/popqq520/p/5404738.html
-    @org.jetbrains.annotations.Nullable
     public static Bitmap getBitmapFormUri(Activity ac, Uri uri) throws FileNotFoundException, IOException {
         InputStream input = ac.getContentResolver().openInputStream(uri);
         BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
