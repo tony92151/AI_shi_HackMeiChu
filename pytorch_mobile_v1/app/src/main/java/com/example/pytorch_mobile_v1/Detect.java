@@ -52,6 +52,7 @@ import org.pytorch.Module;
 import org.pytorch.Tensor;
 import org.pytorch.torchvision.TensorImageUtils;
 
+import static org.bytedeco.javacpp.opencv_core.NORM_MINMAX;
 import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2GRAY;
 import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 
@@ -116,25 +117,36 @@ public class Detect extends AppCompatActivity {
         buttonD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mat2de = new opencv_core.Mat();
-                mat2de = bitmap2Mat(bit2de);
-                cvtColor(mat2de, mat2de, COLOR_BGR2GRAY);
-                opencv_core.Mat dst = new opencv_core.Mat();
-                opencv_imgproc.equalizeHist( mat2de, dst );
+//                mat2de = new opencv_core.Mat(opencv_core.CV_8UC3);
+//                mat2de = bitmap2Mat(bit2de);
+//                //cvtColor(mat2de, mat2de, COLOR_BGR2GRAY);
+//                opencv_core.Mat dst = new opencv_core.Mat();
+//                //cvtColor(mat2de, mat2de, opencv_imgproc.COLOR_BGRA2BGR);
+//
+//                System.out.println(opencv_core.print(mat2de));
+//                opencv_core.normalize(mat2de,dst, 1., 10., NORM_MINMAX, 0, null);
+//                System.out.println(opencv_core.print(dst));
+//                opencv_core.normalize
                 // convert back to rgba
-                opencv_core.Mat frameRgba = new opencv_core.Mat(dst.rows(), dst.cols(), opencv_core.CV_8UC4);
-                cvtColor(dst, frameRgba, opencv_imgproc.COLOR_GRAY2RGBA);
+                //opencv_core.Mat frameRgba = new opencv_core.Mat(dst.rows(), dst.cols(), opencv_core.CV_8UC4);
+                //cvtColor(dst, frameRgba, opencv_imgproc.COLOR_GRAY2RGBA);
                 // crop again to correct alpha
                 //Mat frameAlpha = new Mat(frameRgba.rows(), frameRgba.cols(), opencv_core.CV_8UC4, new Scalar(0, 0, 0, 0));
 
-                bit2de = mat2Bitmap(frameRgba);
-                imgshow.setImageBitmap(bit2de);
+                //bit2de = mat2Bitmap(dst);
+                //imgshow.setImageBitmap(bit2de);
 
                 bit2de  = Bitmap.createScaledBitmap(bit2de, 64, 64, true);
 
+                bit2de = rotateBitmapByDegree(bit2de, 90);
+
+                float mean_std[] = new float[] {0.5f,0.5f,0.5f};
+
                 // preparing input tensor
-                final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(bit2de,
-                        TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB);
+
+//                final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(bit2de,
+//                        TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB);
+                final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(bit2de, mean_std, mean_std);
                 System.out.println("Convert to tensor.");
                 // running the model
                 final Tensor outputTensor = module.forward(IValue.from(inputTensor)).toTensor();
@@ -323,4 +335,12 @@ public class Detect extends AppCompatActivity {
             return file.getAbsolutePath();
         }
     }
+
+//    static int[] matToIntArray(opencv_core.Mat mRgba) {
+//        opencv_core.print() rgb = new MatOfInt(opencv_core.CV_32S);
+//        mRgba.convertTo(rgb, opencv_core.CV_32S);
+//        int[] rgba = new int[(int)(rgb.total()*rgb.channels())];
+//        rgb.get(0,0,rgba);
+//        return rgba;
+//    }
 }
