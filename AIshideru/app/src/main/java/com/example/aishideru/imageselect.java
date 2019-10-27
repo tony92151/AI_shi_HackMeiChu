@@ -248,17 +248,6 @@ public class imageselect extends AppCompatActivity {
 
     }
 
-//    public opencv_core.Mat bitmap2Mat(Bitmap bt){
-//        Frame fr = converterToBitmap.convert(bt);
-//        opencv_core.Mat mat = converterToMat.convertToMat(fr);
-//        return mat;
-//    }
-//
-//    public Bitmap mat2Bitmap(opencv_core.Mat ma){
-//        Frame frame_after = converterToMat.convert(ma);
-//        Bitmap bitAfter = converterToBitmap.convert(frame_after);
-//        return  bitAfter;
-//    }
 
     public static String assetFilePath(Context context, String assetName) throws IOException {
         File file = new File(context.getFilesDir(), assetName);
