@@ -1,3 +1,3 @@
-# instagramRobot
-Main purpose: Create a robot that can transmit the post from other. 
-Meanwhile, try to analyze whether this post would be popular or not.
+# instagram crawler
+It is to crawler post in instagram.
+And label the comment number and location which it will use to train.
