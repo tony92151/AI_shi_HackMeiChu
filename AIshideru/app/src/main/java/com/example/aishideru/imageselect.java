@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import org.pytorch.IValue;
 import org.pytorch.Module;
@@ -101,20 +102,47 @@ public class imageselect extends AppCompatActivity {
                 for(float log : scores)
                 {
                     //Log.v("Tag",log);
-                    System.out.println(log);
+                    //System.out.println(log);
                 }
+
 
                 // searching for the index with maximum score
                 float maxScore = -Float.MAX_VALUE;
-                int maxScoreIdx = -1;
+
+                float maxcoScore = -Float.MAX_VALUE;
+
+                float maxLikeIdx = -1;
+
+                float maxcomIdx = -1;
+
                 for (int i = 0; i < scores.length; i++) {
-                    if (scores[i] > maxScore) {
-                        maxScore = scores[i];
-                        maxScoreIdx = i;
+
+                    if (i<30){
+                        if (scores[i] > maxScore) {
+                            maxScore = scores[i];
+                            maxLikeIdx = i;
+                        }
+                    }else {
+                        if (scores[i] > maxcoScore) {
+                            maxcoScore = scores[i];
+                            maxcomIdx = i-30;
+                        }
                     }
                 }
 
-                ans.setText("ANS: "+maxScoreIdx);
+                System.out.println(">>>>"+scores.length);
+
+                System.out.println(">>>>"+maxLikeIdx);
+                System.out.println(">>>>"+maxcomIdx);
+
+                float pop = (maxLikeIdx/30.0f)*0.30f + (maxcomIdx/355.0f)*0.70f;
+                pop = pop*100;
+
+                String s = String.valueOf( pop );
+                String t = s.substring(0, s.indexOf(".") + 3);
+
+
+                ans.setText("Popularity : " + t +" %");
             }
         });
     }
@@ -145,7 +173,7 @@ public class imageselect extends AppCompatActivity {
                     Bitmap bit = null;
                     try {
                         bit = getBitmapFormUri(activity,selectedImage);
-                        bit = rotateBitmapByDegree(bit, 90);
+                        //bit = rotateBitmapByDegree(bit, 90);
                         bit  = Bitmap.createScaledBitmap(bit, imgW, imgH, true);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -155,7 +183,7 @@ public class imageselect extends AppCompatActivity {
                     imgshow.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     imgshow.setImageBitmap(bit);
                     bit2de = bit;
-                    ans.setText("ANS");
+                    ans.setText("Popularity : ");
                     break;
             }
 
