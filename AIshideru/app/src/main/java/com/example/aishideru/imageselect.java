@@ -139,7 +139,7 @@ public class imageselect extends AppCompatActivity {
                 pop = pop*100;
 
                 String s = String.valueOf( pop );
-                String t = s.substring(0, s.indexOf(".") + 3);
+                String t = s.substring(0, s.indexOf(".") + 2);
 
 
                 ans.setText("Popularity : " + t +" %");
